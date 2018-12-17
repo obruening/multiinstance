@@ -1,0 +1,163 @@
+= Multi Instance Activities in Camunda
+:toc: macro 
+Oliver Brüning <obruening@yahoo.com>
+2018-12-13
+
+toc::[]
+
+
+== Introduction
+
+Multi Instance Activities are used to repeat steps in a process. In this episode we will demonstrate how to
+use various kinds of lists to dynamically create user tasks and assign each of these tasks to a different user.
+
+== Simple List of Strings
+
+This is the most straightforward approach. Just save the list of users
+in a process variable and reference it in the process definition.
+
+.MultiInstanceWithSimpleListCommand.java
+[source,java]
+----
+@Override
+@Transactional("primaryTransactionManager")
+public void execute() {
+        
+    List<String> assigneeList = Arrays.asList("Peter", "Paul", "Mary");
+        
+    Map<String, Object> map = new TreeMap<>();
+    map.put("assigneeList", assigneeList);
+        
+    runtimeService.startProcessInstanceByKey("multiInstanceWithSimpleList", map);
+}
+----
+
+
+
+.multiInstanceWithSimpleList.bpmn
+[source,xml]
+----
+<bpmn:userTask id="multiInstanceUserTask" name="Multi Instance User Task" camunda:assignee="${assignee}">
+    <bpmn:incoming>start_to_usertask</bpmn:incoming>
+    <bpmn:outgoing>usertask_to_end</bpmn:outgoing>
+    <bpmn:multiInstanceLoopCharacteristics camunda:collection="${assigneeList}" camunda:elementVariable="assignee" />
+</bpmn:userTask>
+----
+
+
+== List of a more complex Type
+
+Reference the property which contains the assignee. In this case, 
+we would like to use
+the assignee property of the Item class.
+
+.MultiInstanceWithComplexListCommand.java
+[source,java]
+----
+@Override
+@Transactional("primaryTransactionManager")
+public void execute() {
+
+    List<Item> itemList = Arrays.asList(
+        new Item("Peter", "do something 1"), 
+        new Item("Paul", "do something 2"),
+        new Item("Mary", "do something 3"));
+
+    Map<String, Object> map = new TreeMap<>();
+    map.put("itemList", itemList);
+
+    runtimeService.startProcessInstanceByKey("multiInstanceWithComplexList", map);
+
+}
+----
+
+.multiInstanceWithComplexList.bpmn
+[source,xml]
+----
+<bpmn:userTask id="multiInstanceUserTask" name="Multi Instance User Task" camunda:assignee="${item.assignee}">
+    <bpmn:incoming>start_to_usertask</bpmn:incoming>
+    <bpmn:outgoing>usertask_to_end</bpmn:outgoing>
+    <bpmn:multiInstanceLoopCharacteristics camunda:collection="${itemList}" camunda:elementVariable="item" />
+</bpmn:userTask>
+----
+
+
+
+== List of JPA Entities
+
+In this example, we save the JPA entity Post as a process variable. The Post entity has a list of Comment entities. These Comment entities are used for the creation of the user tasks.
+
+.MultiInstanceWithJpaEntitiesCommand.java
+[source,java]
+----
+@Override
+@Transactional("primaryTransactionManager")
+public void execute() {
+
+    Post post = new Post();
+    post.setText("Post");
+
+    post.setComments(Arrays.asList(
+            new Comment(post, "Peter", "Comment 1"), 
+            new Comment(post, "Paul", "Comment 2"),
+            new Comment(post, "Mary", "Comment 2")));
+
+    post = postService.save(post);
+
+    Map<String, Object> map = new TreeMap<>();
+    map.put("post", post);
+
+    runtimeService.startProcessInstanceByKey("multiInstanceWithJpaEntities", map);
+}
+----
+
+
+.multiInstanceWithJpaEntitiesList.bpmn
+[source,xml]
+----
+<bpmn:userTask id="multiInstanceUserTask" name="Multi Instance User Task" camunda:assignee="${comment.author}">
+    <bpmn:incoming>start_to_usertask</bpmn:incoming>
+    <bpmn:outgoing>usertask_to_end</bpmn:outgoing>
+    <bpmn:multiInstanceLoopCharacteristics camunda:collection="${post.comments}" camunda:elementVariable="comment" />
+</bpmn:userTask>
+----
+
+
+== Spring Service
+
+Another good option is to use a Spring Service that provides for the list of assignees.
+
+.AssigneeService.java
+[source,java]
+----
+@Service("assigneeService")
+public class AssigneeService {
+    
+    public List<String> getAssignees() {
+        return Arrays.asList("Peter", "Paul", "Mary");
+    }
+
+}
+----
+
+
+.MultiInstanceWithSpringServiceCommand.java
+[source,java]
+----
+@Override
+@Transactional("primaryTransactionManager")
+public void execute() {
+        
+    runtimeService.startProcessInstanceByKey("multiInstanceWithSpringService");
+}
+----
+
+.multiInstanceWithSpringService.bpmn
+[source,xml]
+----
+<bpmn:userTask id="multiInstanceUserTask" name="Multi Instance User Task" camunda:assignee="${assignee}">
+    <bpmn:incoming>start_to_usertask</bpmn:incoming>
+    <bpmn:outgoing>usertask_to_end</bpmn:outgoing>
+    <bpmn:multiInstanceLoopCharacteristics camunda:collection="${assigneeService.getAssignees()}" camunda:elementVariable="assignee" />
+</bpmn:userTask>
+----
