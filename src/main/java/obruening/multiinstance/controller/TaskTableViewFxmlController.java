@@ -20,49 +20,49 @@ import obruening.multiinstance.config.UpdateEvent;
 @Component
 public class TaskTableViewFxmlController extends Controller implements ApplicationListener<UpdateEvent> {
 
-	@Autowired
-	private TaskService taskService;
+    @Autowired
+    private TaskService taskService;
 
-	@FXML
-	private TableView<Task> taskTableView;
+    @FXML
+    private TableView<Task> taskTableView;
 
-	@FXML
-	private TableColumn<Task, String> idColumn;
-	
-	@FXML
-	private TableColumn<Task, String> taskDefinitionKeyColumn;
+    @FXML
+    private TableColumn<Task, String> idColumn;
+    
+    @FXML
+    private TableColumn<Task, String> taskDefinitionKeyColumn;
 
-	@FXML
-	private TableColumn<Task, String> processInstanceIdColumn;
+    @FXML
+    private TableColumn<Task, String> processInstanceIdColumn;
 
-	@FXML
-	private TableColumn<Task, String> processDefinitionIdColumn;
+    @FXML
+    private TableColumn<Task, String> processDefinitionIdColumn;
 
-	@FXML
-	private TableColumn<Task, String> assigneeColumn;
+    @FXML
+    private TableColumn<Task, String> assigneeColumn;
 
-	@FXML
-	public void initialize() throws MalformedURLException {
+    @FXML
+    public void initialize() throws MalformedURLException {
 
-		idColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("id"));
-		taskDefinitionKeyColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("taskDefinitionKey"));
-		processInstanceIdColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("processInstanceId"));
-		processDefinitionIdColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("processDefinitionId"));
-		assigneeColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("assignee"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("id"));
+        taskDefinitionKeyColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("taskDefinitionKey"));
+        processInstanceIdColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("processInstanceId"));
+        processDefinitionIdColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("processDefinitionId"));
+        assigneeColumn.setCellValueFactory(new PropertyValueFactory<Task, String>("assignee"));
 
-		update();
-	}
+        update();
+    }
 
-	@Override
-	public void onApplicationEvent(UpdateEvent event) {
-		update();
-	}
+    @Override
+    public void onApplicationEvent(UpdateEvent event) {
+        update();
+    }
 
-	private void update() {
+    private void update() {
 
-		List<Task> taskList = taskService.createTaskQuery().orderByTaskCreateTime().asc().list();
-		ObservableList<Task> observableTaskList = FXCollections.observableArrayList(taskList);
-		taskTableView.setItems(observableTaskList);
-	}
+        List<Task> taskList = taskService.createTaskQuery().orderByTaskCreateTime().asc().list();
+        ObservableList<Task> observableTaskList = FXCollections.observableArrayList(taskList);
+        taskTableView.setItems(observableTaskList);
+    }
 
 }

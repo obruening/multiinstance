@@ -21,47 +21,47 @@ import obruening.multiinstance.config.UpdateEvent;
 @Component
 public class HiProcinstTableViewFxmlController extends Controller implements ApplicationListener<UpdateEvent> {
 
-	@Autowired
-	private HistoryService historyService;
+    @Autowired
+    private HistoryService historyService;
 
-	@FXML
-	private TableView<HistoricProcessInstance> hiProcinstTableView;
+    @FXML
+    private TableView<HistoricProcessInstance> hiProcinstTableView;
 
-	@FXML
-	private TableColumn<HistoricProcessInstance, String> idColumn;
-	
-	@FXML
-	private TableColumn<HistoricProcessInstance, String> processDefinitionIdColumn;
+    @FXML
+    private TableColumn<HistoricProcessInstance, String> idColumn;
+    
+    @FXML
+    private TableColumn<HistoricProcessInstance, String> processDefinitionIdColumn;
 
-	@FXML
-	private TableColumn<HistoricProcessInstance, Date> startTimeColumn;
+    @FXML
+    private TableColumn<HistoricProcessInstance, Date> startTimeColumn;
 
-	@FXML
-	private TableColumn<HistoricProcessInstance, Date> endTimeColumn;
-	
+    @FXML
+    private TableColumn<HistoricProcessInstance, Date> endTimeColumn;
+    
 
-	@FXML
-	public void initialize() throws MalformedURLException {
+    @FXML
+    public void initialize() throws MalformedURLException {
 
-		idColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, String>("id"));
-		processDefinitionIdColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, String>("processDefinitionId"));
-		startTimeColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, Date>("startTime"));
-		endTimeColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, Date>("endTime"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, String>("id"));
+        processDefinitionIdColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, String>("processDefinitionId"));
+        startTimeColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, Date>("startTime"));
+        endTimeColumn.setCellValueFactory(new PropertyValueFactory<HistoricProcessInstance, Date>("endTime"));
 
-		update();
-	}
+        update();
+    }
 
-	@Override
-	public void onApplicationEvent(UpdateEvent event) {
-		
-    	update();
-	}
+    @Override
+    public void onApplicationEvent(UpdateEvent event) {
+        
+        update();
+    }
 
-	private void update() {
+    private void update() {
 
-		List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().asc().list();
-		ObservableList<HistoricProcessInstance> observableHistoricProcessInstanceList = FXCollections.observableArrayList(historicProcessInstanceList);
-		hiProcinstTableView.setItems(observableHistoricProcessInstanceList);
-	}
+        List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().asc().list();
+        ObservableList<HistoricProcessInstance> observableHistoricProcessInstanceList = FXCollections.observableArrayList(historicProcessInstanceList);
+        hiProcinstTableView.setItems(observableHistoricProcessInstanceList);
+    }
 
 }

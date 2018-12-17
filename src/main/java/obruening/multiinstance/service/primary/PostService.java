@@ -10,11 +10,11 @@ import obruening.multiinstance.repository.primary.PostRepository;
 @Service
 public class PostService {
 
-	@Autowired
-	private PostRepository postRepository;
+    @Autowired
+    private PostRepository postRepository;
 
-	@Transactional("primaryTransactionManager")
-	public Post save(Post post) {
-		return postRepository.save(post);
-	}
+    @Transactional("primaryTransactionManager")
+    public Post save(Post post) {
+        return postRepository.save(post);
+    }
 }

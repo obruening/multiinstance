@@ -15,23 +15,23 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "posts")
 public class Post {
-	
+    
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
-		
-	private String text;
-	
+    private Long id;
+        
+    private String text;
+    
     @OneToMany(mappedBy="post", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-	private List<Comment> comments;
-	
-	public Long getId() {
-		return id;
-	}
+    private List<Comment> comments;
+    
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getText() {
         return text;
@@ -47,5 +47,5 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
-    }	
+    }    
 }

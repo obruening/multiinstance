@@ -31,23 +31,23 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         basePackages = { "obruening.multiinstance.repository.primary"} )
 @ConfigurationProperties(prefix="primary.datasource")
 public class PrimaryDatabaseConfig {
-	
-	@Primary
+    
+    @Primary
     @Bean(name = "primaryDataSource")
-	@ConfigurationProperties(prefix="primary.datasource")
+    @ConfigurationProperties(prefix="primary.datasource")
     public DataSource primaryJdbcDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-	@Primary
+    @Primary
     @Bean(name = "primaryEntityManagerFactory")
     @PersistenceContext( unitName = "primary" )
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
             EntityManagerFactoryBuilder builder,
             @Qualifier("primaryDataSource") DataSource dataSource) {
-		
-		Map<String, Object> properties = new HashMap<String, Object>();
-	    properties.put("hibernate.hbm2ddl.auto", "create");
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("hibernate.hbm2ddl.auto", "create");
         return builder
                 .dataSource(dataSource)
                 .packages("obruening.multiinstance.model.primary*")
@@ -56,18 +56,18 @@ public class PrimaryDatabaseConfig {
                 .build();
     }
 
-	@Primary
+    @Primary
     @Bean(name = "primaryTransactionManager")
     public JpaTransactionManager transactionManager(
             @Qualifier("primaryEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
-	
-	
-	@Primary
+    
+    
+    @Primary
     @Bean(name = "primaryH2Server", initMethod = "start", destroyMethod = "stop")
-	public Server h2Server() throws SQLException {
-			return  Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082");
-	}
-	
+    public Server h2Server() throws SQLException {
+            return  Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082");
+    }
+    
 } 

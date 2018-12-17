@@ -35,41 +35,41 @@ public class BorderPaneFxmlController extends Controller {
     
     @FXML
     public void initialize() throws IOException {
-    	
-    	Platform.runLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					borderPane.setLeft(loadFXML("/fxml/left_pane.fxml"));
-					borderPane.setCenter(loadFXML("/fxml/tabview_pane.fxml"));
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		
-		 
-		 closeMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-			
-			@Override
-			public void handle(ActionEvent event) {
+        
+        Platform.runLater(new Runnable() {
+            
+            @Override
+            public void run() {
+                try {
+                    borderPane.setLeft(loadFXML("/fxml/left_pane.fxml"));
+                    borderPane.setCenter(loadFXML("/fxml/tabview_pane.fxml"));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        
+         
+         closeMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent event) {
 
-				Platform.exit();
-			}
-		});
-		 
-		 
-		 aboutMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+                Platform.exit();
+            }
+        });
+         
+         
+         aboutMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
-			@Override
-			public void handle(ActionEvent event) {
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("About");
-				alert.setHeaderText("Multi Instance Demo");
-				alert.setContentText("Multi Instance Activities in Camunda");
-				alert.showAndWait();
-			}
-		});
+            @Override
+            public void handle(ActionEvent event) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("About");
+                alert.setHeaderText("Multi Instance Demo");
+                alert.setContentText("Multi Instance Activities in Camunda");
+                alert.showAndWait();
+            }
+        });
     }
 }

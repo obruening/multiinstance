@@ -22,29 +22,29 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
+    private Long id;
 
     private String author;
     
-	private String text;
-	
+    private String text;
+    
     @ManyToOne
     @JoinColumn(name="post_id")
-	private Post post;
+    private Post post;
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-	
-	public String getAuthor() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public String getAuthor() {
         return author;
     }
     
-	public void setAuthor(String author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
     

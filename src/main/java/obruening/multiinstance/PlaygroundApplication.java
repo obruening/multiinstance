@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 @SpringBootApplication
 public class PlaygroundApplication extends Application {
-	
+    
     private ConfigurableApplicationContext springContext;
     
     private Parent root;
@@ -27,9 +27,9 @@ public class PlaygroundApplication extends Application {
     
     @Bean
     public HostServices createHostService() {
-    	return this.getHostServices();
+        return this.getHostServices();
     }
-	
+    
     @Override
     public void init() throws Exception {
 
@@ -52,19 +52,19 @@ public class PlaygroundApplication extends Application {
     
     @Override
     public void stop() {
-    	
-    	System.out.println("stopping ...");
+        
+        System.out.println("stopping ...");
 
-    	int exitCode = SpringApplication.exit(springContext, new ExitCodeGenerator() {
+        int exitCode = SpringApplication.exit(springContext, new ExitCodeGenerator() {
 
-    		@Override
-    		public int getExitCode() {
+            @Override
+            public int getExitCode() {
 
-    		    return 0;
-    		}
+                return 0;
+            }
         });
 
-    	System.exit(exitCode);
+        System.exit(exitCode);
     }
     
 }

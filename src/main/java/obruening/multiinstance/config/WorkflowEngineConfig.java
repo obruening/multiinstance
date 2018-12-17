@@ -24,74 +24,74 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 public class WorkflowEngineConfig {
-	
-	@Autowired
-	@Qualifier("primaryDataSource")
-	public DataSource dataSource;
-	
-	@Autowired
-	@Qualifier("primaryTransactionManager")
-	public JpaTransactionManager transactionManager;
-	
-	@Autowired
-	@Qualifier("primaryEntityManagerFactory")
-	public EntityManagerFactory entityManagerFactory;
-	
-	@Value("classpath:/processes/*.bpmn")
-	private Resource[] resources;
-	
-	@Bean
-	SpringProcessEngineConfiguration processEngineConfiguration() {
-		final SpringProcessEngineConfiguration config = new SpringProcessEngineConfiguration();
-		config.setDataSource(dataSource);
-		config.setDatabaseType("h2");
-		config.setTransactionManager(transactionManager);
-		config.setJobExecutorActivate(false);
-		config.setJpaEntityManagerFactory(entityManagerFactory);
-		config.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-		config.setTransactionsExternallyManaged(true);
-		config.setMetricsEnabled(true);
-		
-		config.setDeploymentResources(resources);
-		
-		return config;
-	}
-	
-	@Bean
-	ProcessEngineFactoryBean processEngineFactoryBean() {
-		final ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
-		processEngineFactoryBean.setProcessEngineConfiguration(processEngineConfiguration());
-		return processEngineFactoryBean;
-	}
-	
-	@Bean
-	public RepositoryService repositoryService(ProcessEngineFactoryBean pefb) throws Exception{
-		return pefb.getObject().getRepositoryService();
-	}
-	
-	@Bean
-	public RuntimeService runtimeService(ProcessEngineFactoryBean pefb) throws Exception {
-		return pefb.getObject().getRuntimeService();
-	}
+    
+    @Autowired
+    @Qualifier("primaryDataSource")
+    public DataSource dataSource;
+    
+    @Autowired
+    @Qualifier("primaryTransactionManager")
+    public JpaTransactionManager transactionManager;
+    
+    @Autowired
+    @Qualifier("primaryEntityManagerFactory")
+    public EntityManagerFactory entityManagerFactory;
+    
+    @Value("classpath:/processes/*.bpmn")
+    private Resource[] resources;
+    
+    @Bean
+    SpringProcessEngineConfiguration processEngineConfiguration() {
+        final SpringProcessEngineConfiguration config = new SpringProcessEngineConfiguration();
+        config.setDataSource(dataSource);
+        config.setDatabaseType("h2");
+        config.setTransactionManager(transactionManager);
+        config.setJobExecutorActivate(false);
+        config.setJpaEntityManagerFactory(entityManagerFactory);
+        config.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        config.setTransactionsExternallyManaged(true);
+        config.setMetricsEnabled(true);
+        
+        config.setDeploymentResources(resources);
+        
+        return config;
+    }
+    
+    @Bean
+    ProcessEngineFactoryBean processEngineFactoryBean() {
+        final ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
+        processEngineFactoryBean.setProcessEngineConfiguration(processEngineConfiguration());
+        return processEngineFactoryBean;
+    }
+    
+    @Bean
+    public RepositoryService repositoryService(ProcessEngineFactoryBean pefb) throws Exception{
+        return pefb.getObject().getRepositoryService();
+    }
+    
+    @Bean
+    public RuntimeService runtimeService(ProcessEngineFactoryBean pefb) throws Exception {
+        return pefb.getObject().getRuntimeService();
+    }
  
-	@Bean
-	public HistoryService historyService(ProcessEngineFactoryBean pefb) throws Exception {
-		return pefb.getObject().getHistoryService();
-	}
+    @Bean
+    public HistoryService historyService(ProcessEngineFactoryBean pefb) throws Exception {
+        return pefb.getObject().getHistoryService();
+    }
  
-	@Bean
-	public ManagementService managementService(ProcessEngineFactoryBean pefb) throws Exception {
-		return pefb.getObject().getManagementService();
-	}
+    @Bean
+    public ManagementService managementService(ProcessEngineFactoryBean pefb) throws Exception {
+        return pefb.getObject().getManagementService();
+    }
  
-	@Bean
-	public IdentityService identityService(ProcessEngineFactoryBean pefb) throws Exception {
-		return pefb.getObject().getIdentityService();
-	}
+    @Bean
+    public IdentityService identityService(ProcessEngineFactoryBean pefb) throws Exception {
+        return pefb.getObject().getIdentityService();
+    }
  
-	@Bean
-	public TaskService taskService(ProcessEngineFactoryBean pefb) throws Exception {
-		return pefb.getObject().getTaskService();
-	}
+    @Bean
+    public TaskService taskService(ProcessEngineFactoryBean pefb) throws Exception {
+        return pefb.getObject().getTaskService();
+    }
 
 }
