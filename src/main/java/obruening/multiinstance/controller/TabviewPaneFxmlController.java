@@ -3,7 +3,10 @@ package obruening.multiinstance.controller;
 import java.io.IOException;
 import java.net.URL;
 
+import org.h2.server.web.WebServer;
+import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javafx.application.HostServices;
@@ -19,6 +22,12 @@ public class TabviewPaneFxmlController extends Controller {
 
     @Autowired
     private HostServices hostServices;
+    
+    @Autowired
+    @Qualifier(value = "primaryH2Url")
+    private String h2Url;
+    
+
     
     @FXML
     private Tab taskTab;
@@ -38,24 +47,24 @@ public class TabviewPaneFxmlController extends Controller {
     @FXML
     private WebView helpWebView;
     
-    private final static String H2_URL = "http://localhost:8082";
-    
     private final static String HELP = "/html/multiinstance.html";
 
     @FXML
     public void initialize() throws IOException {
+    	
         
         taskTab.setContent(loadFXML("/fxml/task_table_view.fxml"));
         hiProcinstTab.setContent(loadFXML("/fxml/hi_procinst_table_view.fxml"));
         
-        URL h2Url = new URL(H2_URL);
+        System.out.println(h2Url);
+        
         WebEngine h2WebEngine = h2WebView.getEngine();
-        h2WebEngine.load(h2Url.toString());
+        h2WebEngine.load(h2Url);
         
         URL helpUrl = this.getClass().getResource(HELP);
         WebEngine helpWebEngine = helpWebView.getEngine();
         helpWebEngine.load(helpUrl.toString());
 
-        h2Hyperlink.setOnAction(event -> hostServices.showDocument(H2_URL));
+        h2Hyperlink.setOnAction(event -> hostServices.showDocument(h2Url));
       }
 }

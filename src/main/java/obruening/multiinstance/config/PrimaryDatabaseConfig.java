@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 
+import org.h2.server.web.WebServer;
 import org.h2.tools.Server;
 //import org.hibernate.envers.strategy.ValidityAuditStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -62,12 +63,28 @@ public class PrimaryDatabaseConfig {
             @Qualifier("primaryEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
-    
-    
+
     @Primary
     @Bean(name = "primaryH2Server", initMethod = "start", destroyMethod = "stop")
-    public Server h2Server() throws SQLException {
-            return  Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082");
+    public Server h2Server(@Qualifier("primaryWebServer") WebServer webServer) throws SQLException {
+       
+    	return new Server(webServer, new String[] { "-web", "-webAllowOthers", "-webPort", "8082" });
     }
     
+    @Primary
+    @Bean(name = "primaryWebServer")
+    public WebServer h2WebServer() throws SQLException {
+
+    	return new WebServer();
+    }
+    
+    @Primary
+    @Bean(name = "primaryH2Url")
+    public String h2Url(
+    		@Qualifier("primaryH2Server") Server server,
+    		@Qualifier("primaryWebServer") WebServer webServer, 
+    		@Qualifier("primaryDataSource") DataSource dataSource) throws SQLException {
+
+    	return webServer.addSession(dataSource.getConnection());
+    }
 } 
