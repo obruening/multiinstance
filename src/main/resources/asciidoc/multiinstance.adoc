@@ -161,3 +161,51 @@ public void execute() {
     <bpmn:multiInstanceLoopCharacteristics camunda:collection="${assigneeService.getAssignees()}" camunda:elementVariable="assignee" />
 </bpmn:userTask>
 ----
+
+
+== Embedded Subprocess with simple List of Strings
+
+A variation of the first example. Sometimes more than one task should be executed as a multi instance. In this case these tasks can be put in an embedded subprocess. The subprocess then gets the multi instance annotation.
+
+.MultiInstanceWithEmbeddedSubprocessCommand.java
+[source,java]
+----
+@Override
+@Transactional("primaryTransactionManager")
+public void execute() {
+        
+    List<String> assigneeList = Arrays.asList("Peter", "Paul", "Mary");
+        
+    Map<String, Object> map = new TreeMap<>();
+    map.put("assigneeList", assigneeList);
+        
+    runtimeService.startProcessInstanceByKey("multiInstanceWithEmbeddedSubprocess", map);
+}
+----
+
+.multiInstanceWithEmbeddedSubprocess.bpmn
+[source,xml]
+----
+<bpmn:subProcess id="subprocess" name="Subprocess">
+    <bpmn:incoming>start_to_subprocess</bpmn:incoming>
+    <bpmn:outgoing>subprocess_to_end</bpmn:outgoing>
+    <bpmn:multiInstanceLoopCharacteristics camunda:collection="${assigneeList}" camunda:elementVariable="assignee" />
+    <bpmn:userTask id="userTask" name="User Task" camunda:assignee="${assignee}">
+      <bpmn:incoming>start_to_usertask</bpmn:incoming>
+      <bpmn:outgoing>usertask_to_servicetask</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:startEvent id="startSubprocessEvent" name="Start Subprocess Event">
+      <bpmn:outgoing>start_to_usertask</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="start_to_usertask" sourceRef="startSubprocessEvent" targetRef="userTask" />
+    <bpmn:endEvent id="endSubprocessEvent" name="End Subprocess Event">
+      <bpmn:incoming>servicetask_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="servicetask_to_end" sourceRef="serviceTask" targetRef="endSubprocessEvent" />
+    <bpmn:serviceTask id="serviceTask" name="Service Task" camunda:delegateExpression="${simpleServiceTask}">
+      <bpmn:incoming>usertask_to_servicetask</bpmn:incoming>
+      <bpmn:outgoing>servicetask_to_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="usertask_to_servicetask" sourceRef="userTask" targetRef="serviceTask" />
+</bpmn:subProcess>
+----

@@ -537,6 +537,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_list_of_a_more_complex_type">List of a more complex Type</a></li>
 <li><a href="#_list_of_jpa_entities">List of JPA Entities</a></li>
 <li><a href="#_spring_service">Spring Service</a></li>
+<li><a href="#_embedded_subprocess_with_simple_list_of_strings">Embedded Subprocess with simple List of Strings</a></li>
 </ul>
 </div>
 </div>
@@ -709,10 +710,61 @@ the assignee property of the Item class.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_embedded_subprocess_with_simple_list_of_strings">Embedded Subprocess with simple List of Strings</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A variation of the first example. Sometimes more than one task should be executed as a multi instance. In this case these tasks can be put in an embedded subprocess. The subprocess then gets the multi instance annotation.</p>
+</div>
+<div class="listingblock">
+<div class="title">MultiInstanceWithEmbeddedSubprocessCommand.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Override</span>
+<span class="annotation">@Transactional</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">primaryTransactionManager</span><span class="delimiter">&quot;</span></span>)
+<span class="directive">public</span> <span class="type">void</span> execute() {
+
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; assigneeList = <span class="predefined-type">Arrays</span>.asList(<span class="string"><span class="delimiter">&quot;</span><span class="content">Peter</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Paul</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mary</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; map = <span class="keyword">new</span> <span class="predefined-type">TreeMap</span>&lt;&gt;();
+    map.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">assigneeList</span><span class="delimiter">&quot;</span></span>, assigneeList);
+
+    runtimeService.startProcessInstanceByKey(<span class="string"><span class="delimiter">&quot;</span><span class="content">multiInstanceWithEmbeddedSubprocess</span><span class="delimiter">&quot;</span></span>, map);
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">multiInstanceWithEmbeddedSubprocess.bpmn</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;bpmn:subProcess</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">subprocess</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Subprocess</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;bpmn:incoming&gt;</span>start_to_subprocess<span class="tag">&lt;/bpmn:incoming&gt;</span>
+    <span class="tag">&lt;bpmn:outgoing&gt;</span>subprocess_to_end<span class="tag">&lt;/bpmn:outgoing&gt;</span>
+    <span class="tag">&lt;bpmn:multiInstanceLoopCharacteristics</span> <span class="attribute-name">camunda:collection</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${assigneeList}</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">camunda:elementVariable</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">assignee</span><span class="delimiter">&quot;</span></span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;bpmn:userTask</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">userTask</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">User Task</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">camunda:assignee</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${assignee}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+      <span class="tag">&lt;bpmn:incoming&gt;</span>start_to_usertask<span class="tag">&lt;/bpmn:incoming&gt;</span>
+      <span class="tag">&lt;bpmn:outgoing&gt;</span>usertask_to_servicetask<span class="tag">&lt;/bpmn:outgoing&gt;</span>
+    <span class="tag">&lt;/bpmn:userTask&gt;</span>
+    <span class="tag">&lt;bpmn:startEvent</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">startSubprocessEvent</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Start Subprocess Event</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+      <span class="tag">&lt;bpmn:outgoing&gt;</span>start_to_usertask<span class="tag">&lt;/bpmn:outgoing&gt;</span>
+    <span class="tag">&lt;/bpmn:startEvent&gt;</span>
+    <span class="tag">&lt;bpmn:sequenceFlow</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">start_to_usertask</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">sourceRef</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">startSubprocessEvent</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">targetRef</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">userTask</span><span class="delimiter">&quot;</span></span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;bpmn:endEvent</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">endSubprocessEvent</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">End Subprocess Event</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+      <span class="tag">&lt;bpmn:incoming&gt;</span>servicetask_to_end<span class="tag">&lt;/bpmn:incoming&gt;</span>
+    <span class="tag">&lt;/bpmn:endEvent&gt;</span>
+    <span class="tag">&lt;bpmn:sequenceFlow</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">servicetask_to_end</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">sourceRef</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">serviceTask</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">targetRef</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">endSubprocessEvent</span><span class="delimiter">&quot;</span></span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;bpmn:serviceTask</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">serviceTask</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Service Task</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">camunda:delegateExpression</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${simpleServiceTask}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+      <span class="tag">&lt;bpmn:incoming&gt;</span>usertask_to_servicetask<span class="tag">&lt;/bpmn:incoming&gt;</span>
+      <span class="tag">&lt;bpmn:outgoing&gt;</span>servicetask_to_end<span class="tag">&lt;/bpmn:outgoing&gt;</span>
+    <span class="tag">&lt;/bpmn:serviceTask&gt;</span>
+    <span class="tag">&lt;bpmn:sequenceFlow</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">usertask_to_servicetask</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">sourceRef</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">userTask</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">targetRef</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">serviceTask</span><span class="delimiter">&quot;</span></span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;/bpmn:subProcess&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-12-16 09:49:00 MEZ
+Last updated 2019-03-24 16:37:17 MEZ
 </div>
 </div>
 </body>

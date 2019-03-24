@@ -52,7 +52,7 @@ public class LeftPaneFxmlController extends Controller {
     
     private Button createCommandButton(Command command) {
         Button button = new Button(command.getName());
-        button.setMinWidth(100);
+        button.setMinWidth(120);
         button.setUserData(command);
         button.setOnAction(eventHandler);
         

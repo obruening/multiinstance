@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+  <bpmn:process id="multiInstanceWithEmbeddedSubprocess" name="MultiInstanceWithEmbeddedSubprocess" isExecutable="true">
+    <bpmn:startEvent id="startEvent" name="Start Event">
+      <bpmn:outgoing>start_to_subprocess</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="subprocess" name="Subprocess">
+      <bpmn:incoming>start_to_subprocess</bpmn:incoming>
+      <bpmn:outgoing>subprocess_to_end</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${assigneeList}" camunda:elementVariable="assignee" />
+      <bpmn:userTask id="userTask" name="User Task" camunda:assignee="${assignee}">
+        <bpmn:incoming>start_to_usertask</bpmn:incoming>
+        <bpmn:outgoing>usertask_to_servicetask</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:startEvent id="startSubprocessEvent" name="Start Subprocess Event">
+        <bpmn:outgoing>start_to_usertask</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="start_to_usertask" sourceRef="startSubprocessEvent" targetRef="userTask" />
+      <bpmn:endEvent id="endSubprocessEvent" name="End Subprocess Event">
+        <bpmn:incoming>servicetask_to_end</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="servicetask_to_end" sourceRef="serviceTask" targetRef="endSubprocessEvent" />
+      <bpmn:serviceTask id="serviceTask" name="Service Task" camunda:delegateExpression="${simpleServiceTask}">
+        <bpmn:incoming>usertask_to_servicetask</bpmn:incoming>
+        <bpmn:outgoing>servicetask_to_end</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="usertask_to_servicetask" sourceRef="userTask" targetRef="serviceTask" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="start_to_subprocess" sourceRef="startEvent" targetRef="subprocess" />
+    <bpmn:endEvent id="endEvent" name="End Event">
+      <bpmn:incoming>subprocess_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="subprocess_to_end" sourceRef="subprocess" targetRef="endEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="multiInstanceWithEmbeddedSubprocess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEvent">
+        <dc:Bounds x="264" y="273" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="255" y="309" width="55" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_05mw065_di" bpmnElement="subprocess" isExpanded="true">
+        <dc:Bounds x="434" y="183" width="588" height="217" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0x7d0bv_di" bpmnElement="userTask">
+        <dc:Bounds x="586" y="232" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zv9vhc_di" bpmnElement="start_to_subprocess">
+        <di:waypoint xsi:type="dc:Point" x="300" y="291" />
+        <di:waypoint xsi:type="dc:Point" x="434" y="291" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="322" y="270" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_0fbz75n_di" bpmnElement="startSubprocessEvent">
+        <dc:Bounds x="458" y="254" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="434" y="294" width="85" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_02lu1xj_di" bpmnElement="start_to_usertask">
+        <di:waypoint xsi:type="dc:Point" x="494" y="272" />
+        <di:waypoint xsi:type="dc:Point" x="586" y="272" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="251" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1hmk8qb_di" bpmnElement="endSubprocessEvent">
+        <dc:Bounds x="912" y="254" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="892" y="294" width="81" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0042luw_di" bpmnElement="servicetask_to_end">
+        <di:waypoint xsi:type="dc:Point" x="837" y="272" />
+        <di:waypoint xsi:type="dc:Point" x="912" y="272" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="829.5" y="251" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1409law_di" bpmnElement="serviceTask">
+        <dc:Bounds x="737" y="232" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1k5q7ar_di" bpmnElement="endEvent">
+        <dc:Bounds x="1274" y="273" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1267" y="313" width="51" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_046ta7q_di" bpmnElement="subprocess_to_end">
+        <di:waypoint xsi:type="dc:Point" x="1022" y="291" />
+        <di:waypoint xsi:type="dc:Point" x="1274" y="291" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1103" y="270" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1nw0snm_di" bpmnElement="usertask_to_servicetask">
+        <di:waypoint xsi:type="dc:Point" x="686" y="272" />
+        <di:waypoint xsi:type="dc:Point" x="737" y="272" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="711.5" y="251" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
